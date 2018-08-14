@@ -4,10 +4,6 @@ import PropTypes from 'prop-types';
 import { View, Dimensions, ViewPropTypes, SectionList } from 'react-native';
 import { chunkArray } from './utils';
 import cloneDeep from 'lodash/cloneDeep';
-​
-/**
- * This class is a modification on the main super grid class. It renders a vertical scrolling grid SectionList
- */
 class SuperGridSectionList extends Component {
  constructor(props) {
   super(props);
@@ -16,22 +12,18 @@ class SuperGridSectionList extends Component {
   this.getDimensions = this.getDimensions.bind(this);
   this.state = this.getDimensions();
  }
-​
- //Resetting the dimensions if the decice has changed orientation
  componentWillReceiveProps(nextProps) {
   if (nextProps.itemDimension !== this.props.itemDimension) {
    this.setState({
     ...this.getDimensions(this.state.totalDimension, nextProps.itemDimension),
    });
   }
- }
-​
+  }
  
  onLayout(e) {
   const { staticDimension, onLayout } = this.props;
   if (!staticDimension) {
    const { width, height } = e.nativeEvent.layout || {};
-​
    this.setState({
     ...this.getDimensions(width),
    });
@@ -40,8 +32,7 @@ class SuperGridSectionList extends Component {
   if (onLayout) {
    onLayout(e);
   }
- }
-​
+}
  getDimensions(lvDimension, itemDim) {
   const { itemWidth, spacing, fixed, staticDimension } = this.props;
   let itemDimension = itemDim || this.props.itemDimension;
@@ -49,14 +40,12 @@ class SuperGridSectionList extends Component {
    itemDimension = itemWidth;
    console.warn('React Native Super Grid - property "itemWidth" is depreciated. Use "itemDimension" instead.');
   }
-​
   const dimension = 'width';
   const totalDimension = lvDimension || staticDimension || Dimensions.get('window')[dimension];
   const itemTotalDimension = itemDimension + spacing;
   const availableDimension = totalDimension - spacing; // One spacing extra
   const itemsPerRow = Math.floor(availableDimension / itemTotalDimension);
   const containerDimension = availableDimension / itemsPerRow;
-​
   return {
    totalDimension,
    itemDimension,
@@ -66,7 +55,6 @@ class SuperGridSectionList extends Component {
    fixed,
   };
  }
-​
  //In this method, item is acutally representing a row of items
  renderHorizontalRow({item, index, section, separators}) {
   const { itemDimension, containerDimension, spacing, fixed, sections, itemsPerRow } = this.state;
@@ -87,7 +75,6 @@ class SuperGridSectionList extends Component {
     alignSelf: 'center',
    };
   }
-​
   //Going through the row and rendering each item in that row dividually (all wrapped in a single view element)
   return (
    <View style={rowStyle}>
@@ -101,19 +88,14 @@ class SuperGridSectionList extends Component {
    </View>
   );
  }
-​
  render() {
   const { sections, style, spacing, fixed, itemDimension, renderItem, renderSectionHeader, onLayout, ...props } = this.props;
   const { itemsPerRow } = this.state;
-​
   //Deep copy, so that re-renders and chunkArray functions don't affect the actual items object
   let sectionsCopy = cloneDeep(sections); 
-​
   for (sectionsPair of sectionsCopy){
-​
    //Going through all the sections in sectionsCopy, and dividing their 'data' fields into smaller 'chunked' arrays to represent rows
    const chunked = chunkArray(sectionsPair.data, itemsPerRow); 
-​
    //Now adding metadata to these rows
    const rows = chunked.map((r, i) => {
     const keydRow = [...r];
@@ -124,7 +106,6 @@ class SuperGridSectionList extends Component {
    });
    sectionsPair.data = rows;
   }
-​
   return (
    <SectionList
     sections={sectionsCopy}
@@ -139,7 +120,6 @@ class SuperGridSectionList extends Component {
   );
  }
 }
-​
 SuperGridSectionList.propTypes = {
  renderItem: PropTypes.func.isRequired,
  sections: PropTypes.arrayOf(PropTypes.any).isRequired,
@@ -151,7 +131,6 @@ SuperGridSectionList.propTypes = {
  staticDimension: PropTypes.number,
  onLayout: PropTypes.func,
 };
-​
 SuperGridSectionList.defaultProps = {
  fixed: false,
  itemDimension: 120,
@@ -160,5 +139,4 @@ SuperGridSectionList.defaultProps = {
  style: {},
  staticDimension: undefined,
 };
-​
 export default SuperGridSectionList;
